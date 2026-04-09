@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ani's Trading Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --border: #222222;
+    --green: #00ff87;
+    --red: #ff3b5c;
+    --amber: #ffb800;
+    --blue: #3b82f6;
+    --text: #f0f0f0;
+    --muted: #666;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-left h1 {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--green);
+  }
+
+  .header-left p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-family: var(--mono);
+  }
+
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0,255,135,0.08);
+    border: 1px solid rgba(0,255,135,0.2);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: var(--mono);
+    color: var(--green);
+  }
+
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .metric {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .metric-label {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  .metric-value {
+    font-family: var(--mono);
+    font-size: 26px;
+    font-weight: 700;
+  }
+
+  .metric-value.green { color: var(--green); }
+  .metric-value.red { color: var(--red); }
+  .metric-value.white { color: var(--text); }
+  .metric-value.amber { color: var(--amber); }
+
+  .metric-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-family: var(--mono);
+  }
+
+  .section {
+    margin-bottom: 24px;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: var(--mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+
+  .section-count {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead th {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+
+  tbody td {
+    padding: 12px 16px;
+    font-size: 13px;
+    font-family: var(--mono);
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-family: var(--mono);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .badge-green { background: rgba(0,255,135,0.1); color: var(--green); border: 1px solid rgba(0,255,135,0.2); }
+  .badge-red { background: rgba(255,59,92,0.1); color: var(--red); border: 1px solid rgba(255,59,92,0.2); }
+  .badge-amber { background: rgba(255,184,0,0.1); color: var(--amber); border: 1px solid rgba(255,184,0,0.2); }
+  .badge-blue { background: rgba(59,130,246,0.1); color: var(--blue); border: 1px solid rgba(59,130,246,0.2); }
+
+  .sport-tag {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 2px;
+    font-size: 9px;
+    font-family: var(--mono);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-right: 6px;
+  }
+
+  .nba { background: #c9a84c22; color: #c9a84c; border: 1px solid #c9a84c33; }
+  .mlb { background: #3b82f622; color: var(--blue); border: 1px solid #3b82f633; }
+
+  .pnl-pos { color: var(--green); }
+  .pnl-neg { color: var(--red); }
+
+  .risk-bar {
+    width: 60px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  .risk-fill { height: 100%; border-radius: 2px; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .bot-status {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .bot-status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    font-family: var(--mono);
+  }
+
+  .status-row:last-child { border-bottom: none; }
+  .status-key { color: var(--muted); }
+  .status-val { color: var(--text); }
+
+  .mini-chart {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  svg.chart { width: 100%; height: 80px; }
+
+  .empty-state {
+    padding: 32px 16px;
+    text-align: center;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+
+  .footer {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-text {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .refresh-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .refresh-btn:hover {
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 16px; }
+    .two-col { grid-template-columns: 1fr; }
+    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>ANI // TRADING BOT</h1>
+    <p id="last-updated">Last updated: just now</p>
+  </div>
+  <div class="live-badge">
+    <div class="live-dot"></div>
+    LIVE
+  </div>
+</div>
+
+<div class="metrics-grid">
+  <div class="metric">
+    <div class="metric-label">Account Balance</div>
+    <div class="metric-value white" id="balance">$50.00</div>
+    <div class="metric-sub">Starting: $50.00</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Daily PnL</div>
+    <div class="metric-value green" id="daily-pnl">+$0.00</div>
+    <div class="metric-sub" id="daily-pnl-sub">0 trades today</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Win Rate</div>
+    <div class="metric-value green" id="win-rate">—</div>
+    <div class="metric-sub" id="win-loss">0W / 0L</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Total PnL</div>
+    <div class="metric-value green" id="total-pnl">+$0.00</div>
+    <div class="metric-sub">All time</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Daily Loss Used</div>
+    <div class="metric-value amber" id="daily-loss">$0.00</div>
+    <div class="metric-sub">Limit: $15.00</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Avg Profit/Trade</div>
+    <div class="metric-value white" id="avg-profit">—</div>
+    <div class="metric-sub">Target: $1–3</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <span class="section-title">Live Open Trades</span>
+    <span class="section-count" id="open-count">0 open</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Market</th>
+          <th>Entry Odds</th>
+          <th>Current Odds</th>
+          <th>Size</th>
+          <th>Unrealized PnL</th>
+          <th>Risk</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="open-trades-body">
+        <tr><td colspan="7" class="empty-state">No open trades right now</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="two-col">
+  <div class="bot-status">
+    <div class="bot-status-header">
+      <span class="section-title">Bot Status</span>
+      <span class="badge badge-green" id="bot-status-badge">ACTIVE</span>
+    </div>
+    <div class="status-row"><span class="status-key">Strategy</span><span class="status-val">85% Scalp</span></div>
+    <div class="status-row"><span class="status-key">Sports</span><span class="status-val">NBA + MLB</span></div>
+    <div class="status-row"><span class="status-key">Max per trade</span><span class="status-val">$10.00</span></div>
+    <div class="status-row"><span class="status-key">Stop-loss trigger</span><span class="status-val">-8% odds drop</span></div>
+    <div class="status-row"><span class="status-key">Daily loss limit</span><span class="status-val">$15.00</span></div>
+    <div class="status-row"><span class="status-key">Confidence threshold</span><span class="status-val">85%+</span></div>
+    <div class="status-row"><span class="status-key">NBA window</span><span class="status-val">Last 2 min Q4</span></div>
+    <div class="status-row"><span class="status-key">MLB window</span><span class="status-val">7th inn+ / 4+ run lead</span></div>
+  </div>
+
+  <div class="mini-chart">
+    <div class="section-title" style="margin-bottom:12px;">PnL Curve (7 days)</div>
+    <svg class="chart" viewBox="0 0 300 80" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#00ff87" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#00ff87" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <path id="chart-area" d="M0,70 L300,70 Z" fill="url(#grad)"/>
+      <path id="chart-line" d="M0,70 L300,70" fill="none" stroke="#00ff87" stroke-width="1.5"/>
+      <text x="150" y="45" text-anchor="middle" fill="#444" font-family="Space Mono" font-size="9">No data yet — start trading!</text>
+    </svg>
+    <div style="display:flex; justify-content:space-between; margin-top:8px;">
+      <span style="font-family:var(--mono);font-size:10px;color:var(--muted);" id="chart-start">Day 1</span>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--muted);" id="chart-end">Today</span>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <span class="section-title">Trade History</span>
+    <span class="section-count" id="history-count">0 total trades</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Market</th>
+          <th>Side</th>
+          <th>Entry</th>
+          <th>Exit</th>
+          <th>Size</th>
+          <th>PnL</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody id="history-body">
+        <tr><td colspan="8" class="empty-state">No trades yet — bot is ready to go</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="footer">
+  <span class="footer-text">Powered by Bullpen + Claude Code // Polymarket</span>
+  <button class="refresh-btn" onclick="updateTime()">↻ Refresh</button>
+</div>
+
+<script>
+  function updateTime() {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    document.getElementById('last-updated').textContent = 'Last updated: ' + timeStr;
+  }
+
+  updateTime();
+  setInterval(updateTime, 30000);
+
+  // Sample data injection function — Claude Code will call this with real data
+  window.updateDashboard = function(data) {
+    if (data.balance) document.getElementById('balance').textContent = '$' + parseFloat(data.balance).toFixed(2);
+    if (data.dailyPnl !== undefined) {
+      const el = document.getElementById('daily-pnl');
+      el.textContent = (data.dailyPnl >= 0 ? '+' : '') + '$' + parseFloat(data.dailyPnl).toFixed(2);
+      el.className = 'metric-value ' + (data.dailyPnl >= 0 ? 'green' : 'red');
+    }
+    if (data.wins !== undefined && data.losses !== undefined) {
+      const total = data.wins + data.losses;
+      const wr = total > 0 ? Math.round((data.wins / total) * 100) + '%' : '—';
+      document.getElementById('win-rate').textContent = wr;
+      document.getElementById('win-loss').textContent = data.wins + 'W / ' + data.losses + 'L';
+    }
+    if (data.totalPnl !== undefined) {
+      const el = document.getElementById('total-pnl');
+      el.textContent = (data.totalPnl >= 0 ? '+' : '') + '$' + parseFloat(data.totalPnl).toFixed(2);
+      el.className = 'metric-value ' + (data.totalPnl >= 0 ? 'green' : 'red');
+    }
+    if (data.dailyLoss !== undefined) {
+      document.getElementById('daily-loss').textContent = '$' + parseFloat(data.dailyLoss).toFixed(2);
+    }
+    if (data.openTrades && data.openTrades.length > 0) {
+      document.getElementById('open-count').textContent = data.openTrades.length + ' open';
+      const tbody = document.getElementById('open-trades-body');
+      tbody.innerHTML = data.openTrades.map(t => `
+        <tr>
+          <td><span class="sport-tag ${t.sport.toLowerCase()}">${t.sport}</span>${t.market}</td>
+          <td>${t.entryOdds}%</td>
+          <td>${t.currentOdds}%</td>
+          <td>$${t.size}</td>
+          <td class="${t.unrealizedPnl >= 0 ? 'pnl-pos' : 'pnl-neg'}">${t.unrealizedPnl >= 0 ? '+' : ''}$${parseFloat(t.unrealizedPnl).toFixed(2)}</td>
+          <td>
+            <span class="risk-bar"><span class="risk-fill" style="width:${t.risk}%;background:${t.risk < 30 ? '#00ff87' : t.risk < 60 ? '#ffb800' : '#ff3b5c'}"></span></span>
+            <span style="font-size:11px;color:var(--muted)">${t.risk < 30 ? 'LOW' : t.risk < 60 ? 'MED' : 'HIGH'}</span>
+          </td>
+          <td><span class="badge badge-blue">OPEN</span></td>
+        </tr>
+      `).join('');
+    }
+    if (data.history && data.history.length > 0) {
+      document.getElementById('history-count').textContent = data.history.length + ' total trades';
+      const wins = data.history.filter(t => t.pnl > 0).length;
+      const losses = data.history.filter(t => t.pnl <= 0).length;
+      const avgProfit = data.history.reduce((a, b) => a + b.pnl, 0) / data.history.length;
+      document.getElementById('avg-profit').textContent = (avgProfit >= 0 ? '+' : '') + '$' + avgProfit.toFixed(2);
+      document.getElementById('daily-pnl-sub').textContent = data.history.length + ' trades today';
+      const tbody = document.getElementById('history-body');
+      tbody.innerHTML = data.history.map(t => `
+        <tr>
+          <td style="color:var(--muted)">${t.time}</td>
+          <td><span class="sport-tag ${t.sport.toLowerCase()}">${t.sport}</span>${t.market}</td>
+          <td>${t.side}</td>
+          <td>${t.entry}%</td>
+          <td>${t.exit}%</td>
+          <td>$${t.size}</td>
+          <td class="${t.pnl >= 0 ? 'pnl-pos' : 'pnl-neg'}">${t.pnl >= 0 ? '+' : ''}$${parseFloat(t.pnl).toFixed(2)}</td>
+          <td><span class="badge ${t.pnl >= 0 ? 'badge-green' : 'badge-red'}">${t.pnl >= 0 ? 'WIN' : 'LOSS'}</span></td>
+        </tr>
+      `).join('');
+    }
+  };
+</script>
+</body>
+</html>
