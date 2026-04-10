@@ -50,23 +50,19 @@
   .badge-green { background: rgba(0,255,135,0.1); color: var(--green); border: 1px solid rgba(0,255,135,0.2); }
   .badge-red { background: rgba(255,59,92,0.1); color: var(--red); border: 1px solid rgba(255,59,92,0.2); }
   .badge-blue { background: rgba(59,130,246,0.1); color: var(--blue); border: 1px solid rgba(59,130,246,0.2); }
+  .badge-amber { background: rgba(255,184,0,0.1); color: var(--amber); border: 1px solid rgba(255,184,0,0.2); }
   .sport-tag { display: inline-block; padding: 1px 6px; border-radius: 2px; font-size: 9px; font-family: var(--mono); font-weight: 700; margin-right: 6px; }
   .nba { background: #c9a84c22; color: #c9a84c; border: 1px solid #c9a84c33; }
   .mlb { background: #3b82f622; color: var(--blue); border: 1px solid #3b82f633; }
   .pnl-pos { color: var(--green); }
   .pnl-neg { color: var(--red); }
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
-  .bot-status { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
-  .bot-status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+  .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
   .status-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; font-family: var(--mono); }
   .status-row:last-child { border-bottom: none; }
   .status-key { color: var(--muted); }
-  .mini-chart { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
   .empty-state { padding: 32px 16px; text-align: center; color: var(--muted); font-family: var(--mono); font-size: 12px; }
-  .footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-  .footer-text { font-family: var(--mono); font-size: 11px; color: var(--muted); }
-  .refresh-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); font-family: var(--mono); font-size: 11px; padding: 6px 12px; border-radius: 4px; cursor: pointer; transition: all 0.15s; }
-  .refresh-btn:hover { border-color: var(--green); color: var(--green); }
   .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
   .game-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
   .game-card.live-game { border-color: rgba(0,255,135,0.25); }
@@ -78,11 +74,17 @@
   .team-score.leading { color: var(--green); }
   .qualify-tag { font-size: 9px; font-family: var(--mono); padding: 2px 6px; border-radius: 2px; background: rgba(0,255,135,0.1); color: var(--green); border: 1px solid rgba(0,255,135,0.2); }
   .upcoming-label { font-size: 9px; font-family: var(--mono); padding: 2px 6px; border-radius: 2px; background: rgba(59,130,246,0.1); color: var(--blue); border: 1px solid rgba(59,130,246,0.2); }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+  .footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .footer-text { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .refresh-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); font-family: var(--mono); font-size: 11px; padding: 6px 12px; border-radius: 4px; cursor: pointer; transition: all 0.15s; }
+  .refresh-btn:hover { border-color: var(--green); color: var(--green); }
   @media (max-width: 640px) { body { padding: 16px; } .two-col { grid-template-columns: 1fr; } .metrics-grid { grid-template-columns: repeat(2, 1fr); } }
 </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <div class="header">
   <div class="header-left">
     <h1>ANI // TRADING BOT</h1>
@@ -91,6 +93,7 @@
   <div class="live-badge"><div class="live-dot"></div>LIVE</div>
 </div>
 
+<!-- METRICS -->
 <div class="metrics-grid">
   <div class="metric"><div class="metric-label">Account Balance</div><div class="metric-value white" id="balance">—</div><div class="metric-sub">Starting: $20.05</div></div>
   <div class="metric"><div class="metric-label">Daily PnL</div><div class="metric-value green" id="daily-pnl">—</div><div class="metric-sub" id="daily-sub">Today</div></div>
@@ -100,26 +103,7 @@
   <div class="metric"><div class="metric-label">Total Trades</div><div class="metric-value white" id="total-trades">0</div><div class="metric-sub">All time</div></div>
 </div>
 
-<div class="section">
-  <div class="section-header">
-    <span class="section-title">Live Games</span>
-    <span class="section-title" id="live-count">—</span>
-  </div>
-  <div class="games-grid" id="live-grid">
-    <div style="color:var(--muted);font-family:var(--mono);font-size:12px;padding:8px;">Loading...</div>
-  </div>
-</div>
-
-<div class="section">
-  <div class="section-header">
-    <span class="section-title">Upcoming Games Today</span>
-    <span class="section-title" id="upcoming-count">—</span>
-  </div>
-  <div class="games-grid" id="upcoming-grid">
-    <div style="color:var(--muted);font-family:var(--mono);font-size:12px;padding:8px;">Loading...</div>
-  </div>
-</div>
-
+<!-- OPEN TRADES -->
 <div class="section">
   <div class="section-header"><span class="section-title">Live Open Trades</span><span class="section-title" id="open-count">0 open</span></div>
   <div class="table-wrap">
@@ -130,23 +114,32 @@
   </div>
 </div>
 
+<!-- STRATEGY + CHART -->
 <div class="two-col">
-  <div class="bot-status">
-    <div class="bot-status-header"><span class="section-title">Bot Strategy</span><span class="badge badge-green">ACTIVE</span></div>
-    <div class="status-row"><span class="status-key">Odds range</span><span class="status-val">80% – 88%</span></div>
+  <div class="card">
+    <div class="card-header"><span class="section-title">Current Strategy</span><span class="badge badge-green">ACTIVE</span></div>
     <div class="status-row"><span class="status-key">Sports</span><span class="status-val">NBA + MLB</span></div>
+    <div class="status-row"><span class="status-key">Odds range</span><span class="status-val">80% – 88%</span></div>
     <div class="status-row"><span class="status-key">Max per trade</span><span class="status-val">$10.00</span></div>
+    <div class="status-row"><span class="status-key">Target profit</span><span class="status-val">$1 – $3</span></div>
     <div class="status-row"><span class="status-key">Stop-loss</span><span class="status-val">-8% odds drop</span></div>
     <div class="status-row"><span class="status-key">Daily loss limit</span><span class="status-val">$15.00</span></div>
     <div class="status-row"><span class="status-key">NBA window</span><span class="status-val">Q4 under 8 min</span></div>
     <div class="status-row"><span class="status-key">MLB window</span><span class="status-val">7th inn+ / 4+ runs</span></div>
+    <div class="status-row"><span class="status-key">Scan interval</span><span class="status-val">Every 3 min</span></div>
+    <div class="status-row"><span class="status-key">Skip odds above</span><span class="status-val">90%</span></div>
+    <div class="status-row"><span class="status-key">Resume when</span><span class="status-val">Odds drop below 90%</span></div>
+    <div class="status-row"><span class="status-key">Auto shutdown</span><span class="status-val">11:00 PM PT</span></div>
+    <div class="status-row"><span class="status-key">Idle when</span><span class="status-val">No games scheduled</span></div>
+    <div class="status-row"><span class="status-key">Timezone</span><span class="status-val">Pacific Time (PT)</span></div>
   </div>
-  <div class="mini-chart">
+  <div class="card">
     <div class="section-title" style="margin-bottom:12px;">PnL by trade</div>
-    <canvas id="pnlChart" role="img" aria-label="PnL per trade bar chart">No data yet.</canvas>
+    <canvas id="pnlChart" role="img" aria-label="Bar chart of PnL per trade">No data yet.</canvas>
   </div>
 </div>
 
+<!-- TRADE HISTORY -->
 <div class="section">
   <div class="section-header"><span class="section-title">Trade History</span><span class="section-title" id="history-count">0 trades</span></div>
   <div class="table-wrap">
@@ -157,6 +150,21 @@
   </div>
 </div>
 
+<hr class="divider">
+
+<!-- LIVE GAMES -->
+<div class="section">
+  <div class="section-header"><span class="section-title">Live Games</span><span class="section-title" id="live-count">—</span></div>
+  <div class="games-grid" id="live-grid"><div style="color:var(--muted);font-family:var(--mono);font-size:12px;padding:8px;">Loading...</div></div>
+</div>
+
+<!-- UPCOMING GAMES -->
+<div class="section">
+  <div class="section-header"><span class="section-title">Upcoming Games Today</span><span class="section-title" id="upcoming-count">—</span></div>
+  <div class="games-grid" id="upcoming-grid"><div style="color:var(--muted);font-family:var(--mono);font-size:12px;padding:8px;">Loading...</div></div>
+</div>
+
+<!-- FOOTER -->
 <div class="footer">
   <span class="footer-text">Powered by Bullpen + Claude Code // Polymarket</span>
   <button class="refresh-btn" onclick="loadAll()">↻ Refresh</button>
@@ -199,7 +207,7 @@ async function fetchESPN(sport, league) {
         isUpcoming: st.type.state === 'pre',
         clock: st.displayClock,
         period: st.period,
-        startTime: new Date(e.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+        startTime: new Date(e.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Los_Angeles' }),
         homeOdds: homeOdds ? Math.round(homeOdds) : null,
         awayOdds: awayOdds ? Math.round(awayOdds) : null
       };
@@ -216,8 +224,7 @@ function gameCard(g) {
   const aQ = qualifies(g.awayOdds);
   const anyQ = hQ || aQ;
   const period = g.sport === 'NBA' ? `Q${g.period}` : `Inn ${g.period}`;
-  const timeStr = g.isLive ? `${period} · ${g.clock}` : g.isUpcoming ? `Today ${g.startTime}` : 'Final';
-
+  const timeStr = g.isLive ? `${period} · ${g.clock}` : g.isUpcoming ? `Today ${g.startTime} PT` : 'Final';
   return `<div class="game-card ${g.isLive ? 'live-game' : ''}">
     <div class="game-header">
       <span class="sport-tag ${g.sport.toLowerCase()}">${g.sport}</span>
@@ -225,7 +232,7 @@ function gameCard(g) {
       ${anyQ ? '<span class="qualify-tag">BOT TARGET</span>' : ''}
       ${g.isUpcoming ? '<span class="upcoming-label">UPCOMING</span>' : ''}
     </div>
-    <div style="margin-bottom:10px;">
+    <div style="margin-bottom:4px;">
       <div class="team-row">
         <span class="team-name">${g.awayName}</span>
         <div style="display:flex;align-items:center;gap:10px;">
@@ -249,7 +256,6 @@ async function loadGames() {
   const all = [...nba, ...mlb];
   const live = all.filter(g => g.isLive);
   const upcoming = all.filter(g => g.isUpcoming);
-
   document.getElementById('live-count').textContent = live.length + ' live';
   document.getElementById('upcoming-count').textContent = upcoming.length + ' games';
   document.getElementById('live-grid').innerHTML = live.length ? live.map(gameCard).join('') : '<div style="color:var(--muted);font-family:var(--mono);font-size:12px;padding:8px;">No live games right now</div>';
@@ -266,9 +272,8 @@ async function loadTrades() {
   const closed = trades.filter(t => t.status==='closed');
   const open = trades.filter(t => t.status==='open');
   const todayClosed = closed.filter(t => isToday(t.created_at));
-
-  const totalPnl = closed.reduce((a,b) => a+(b.pnl||0), 0);
-  const dailyPnl = todayClosed.reduce((a,b) => a+(b.pnl||0), 0);
+  const totalPnl = closed.reduce((a,b)=>a+(b.pnl||0),0);
+  const dailyPnl = todayClosed.reduce((a,b)=>a+(b.pnl||0),0);
   const dailyLoss = todayClosed.filter(t=>t.pnl<0).reduce((a,b)=>a+Math.abs(b.pnl||0),0);
   const wins = closed.filter(t=>t.pnl>0).length;
   const losses = closed.filter(t=>t.pnl<=0).length;
@@ -300,7 +305,7 @@ async function loadTrades() {
   document.getElementById('history-count').textContent = closed.length+' trades';
   document.getElementById('history-body').innerHTML = closed.length
     ? closed.map(t=>`<tr>
-        <td style="color:var(--muted)">${new Date(t.created_at).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}</td>
+        <td style="color:var(--muted)">${new Date(t.created_at).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',timeZone:'America/Los_Angeles'})}</td>
         <td>${t.market||'—'}</td>
         <td><span class="sport-tag ${(t.sport||'').toLowerCase()}">${t.sport||'—'}</span></td>
         <td>${t.entry_odds?t.entry_odds+'%':'—'}</td>
@@ -326,7 +331,7 @@ async function loadTrades() {
 
 async function loadAll() {
   await Promise.all([loadGames(), loadTrades()]);
-  document.getElementById('last-updated').textContent = 'Last updated: '+new Date().toLocaleTimeString();
+  document.getElementById('last-updated').textContent = 'Last updated: '+new Date().toLocaleTimeString('en-US',{timeZone:'America/Los_Angeles'});
 }
 
 loadAll();
